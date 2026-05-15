@@ -11,7 +11,16 @@
     <style>
         :root{--cyan:#06b6d4;--cyan-light:#22d3ee;--violet:#8b5cf6;--violet-light:#a78bfa;--pink:#ec4899;--bg-deep:#020617}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Tajawal',sans-serif;background:var(--bg-deep);color:#fff;overflow-x:hidden}
+        
+        /* تعديل أساسي لمنع الاهتزاز العرضي */
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            background: var(--bg-deep);
+            color: #fff;
+            font-family: 'Tajawal', sans-serif;
+        }
+
         ::-webkit-scrollbar{width:8px}::-webkit-scrollbar-track{background:#020617}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px}
         .gradient-text{background:linear-gradient(135deg,#fff 0%,var(--cyan-light) 50%,var(--violet-light) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
         .gradient-text-warm{background:linear-gradient(135deg,var(--cyan-light) 0%,var(--violet-light) 50%,var(--pink) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -50,8 +59,17 @@
         @keyframes spin{to{transform:rotate(360deg)}}
         #mouseGlow{position:fixed;width:500px;height:500px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(6,182,212,0.06) 0%,rgba(139,92,246,0.03) 40%,transparent 70%);transform:translate(-50%,-50%);transition:opacity .3s ease;opacity:0}
         #mouseGlow.active{opacity:1}
-        nav,section,footer,#adminBar,.modal-bg,#savingOverlay,#toast{position:relative;z-index:2}
-        #bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
+        
+        /* حاوية خلفية ذكية لمنع خروج العناصر */
+        .bg-master-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        #bgCanvas{position:absolute;top:0;left:0;width:100%;height:100%}
         .aurora{position:absolute;pointer-events:none;width:200%;height:300px;opacity:0.03;filter:blur(80px);animation:aurora-move 20s ease-in-out infinite alternate}
         .aurora-1{top:10%;left:-50%;background:linear-gradient(90deg,transparent,var(--cyan),var(--violet),transparent);animation-duration:25s}
         .aurora-2{top:40%;left:-30%;background:linear-gradient(90deg,transparent,var(--violet),var(--pink),transparent);animation-duration:30s;animation-delay:-10s}
@@ -60,35 +78,26 @@
         .star{position:absolute;width:2px;height:2px;border-radius:50%;pointer-events:none;animation:twinkle ease-in-out infinite}
         @keyframes twinkle{0%,100%{opacity:0.1;transform:scale(1)}50%{opacity:0.8;transform:scale(1.5)}}
         .meteor{position:absolute;pointer-events:none;width:2px;height:80px;opacity:0;animation:meteor-fall linear infinite}
-        .meteor::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom,rgba(6,182,212,0.6),transparent);border-radius:2px}
-        .meteor::after{content:'';position:absolute;top:0;left:0;width:6px;height:6px;border-radius:50%;background:rgba(6,182,212,0.8);box-shadow:0 0 10px rgba(6,182,212,0.5);transform:translate(-2px,0)}
         @keyframes meteor-fall{0%{transform:translate(0,0) rotate(35deg);opacity:0}5%{opacity:1}30%{opacity:0}100%{transform:translate(-400px,600px) rotate(35deg);opacity:0}}
-        .glow-orb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(1px);animation:orb-drift ease-in-out infinite}
-        @keyframes orb-drift{0%,100%{transform:translate(0,0) scale(1);opacity:0.3}25%{transform:translate(30px,-20px) scale(1.2);opacity:0.6}50%{transform:translate(-10px,-40px) scale(0.8);opacity:0.2}75%{transform:translate(-30px,-10px) scale(1.1);opacity:0.5}}
-        .geo-shape{position:absolute;pointer-events:none;opacity:0;animation:geo-float linear infinite}
-        @keyframes geo-float{0%{transform:translateY(100vh) rotate(0deg) scale(0);opacity:0}10%{opacity:1}90%{opacity:1}100%{transform:translateY(-100px) rotate(360deg) scale(1);opacity:0}}
         .bg-grid{position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(6,182,212,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(6,182,212,0.02) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at 50% 50%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse at 50% 50%,black 20%,transparent 70%)}
         .particle{position:absolute;border-radius:50%;pointer-events:none}
         @keyframes float-p{0%,100%{transform:translateY(0);opacity:0.2}50%{transform:translateY(-25px);opacity:0.6}}
-        *{
-         max-width:100vw;
-         }
-
     </style>
 </head>
 <body>
 
+<div class="bg-master-container">
+    <div class="bg-grid"></div>
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    <div id="starsContainer" style="position:absolute;inset:0;"></div>
+    <div id="meteorsContainer" style="position:absolute;inset:0;"></div>
+    <div id="orbsContainer" style="position:absolute;inset:0;"></div>
+    <div id="geoContainer" style="position:absolute;inset:0;"></div>
+    <canvas id="bgCanvas"></canvas>
+</div>
 
-
-
-
-<div class="bg-grid"></div>
-<div class="aurora aurora-1"></div><div class="aurora aurora-2"></div><div class="aurora aurora-3"></div>
-<div id="starsContainer" style="position:fixed;inset:0;pointer-events:none;z-index:0;"></div>
-<div id="meteorsContainer" style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
-<div id="orbsContainer" style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
-<div id="geoContainer" style="position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;"></div>
-<canvas id="bgCanvas"></canvas>
 <div id="mouseGlow"></div>
 
 <nav class="fixed top-0 left-0 right-0 z-50 nav-blur h-16">
@@ -123,7 +132,6 @@
     </div>
 </div>
 
-<!-- HERO - بدون صورة -->
 <section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
     <div id="particles" class="absolute inset-0 pointer-events-none"></div>
     <div class="max-w-7xl mx-auto px-6 pt-32 pb-20 md:pt-44 md:pb-32 text-center relative z-10">
@@ -141,7 +149,6 @@
             <div class="text-center col-span-2 md:col-span-1"><div class="text-2xl md:text-4xl font-bold counter-val" style="color:var(--pink);" data-target="24">0</div><div class="text-xs text-slate-500 mt-1 editable-content" data-key="stat3_label">ساعة دعم فني</div></div>
         </div>
     </div>
-    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce"><span class="iconify text-slate-600 text-2xl" data-icon="ph:caret-down-bold"></span></div>
 </section>
 
 <section id="services" class="relative py-24">
@@ -227,16 +234,16 @@
 <div id="toast" class="hidden fixed bottom-6 left-6 z-[100] toast-anim"><div class="rounded-xl px-6 py-4 flex items-center gap-3" style="background:#0c1222;border:1px solid rgba(6,182,212,0.2);"><span id="toastIcon" class="iconify text-xl text-emerald-400" data-icon="ph:check-circle-bold"></span><span id="toastText" class="text-sm text-white"></span></div></div>
 
 <script>
-    // ===== PREMIUM BACKGROUND =====
+    // ===== BACKGROUND SCRIPTS =====
     var canvas=document.getElementById('bgCanvas');var ctx=canvas.getContext('2d');var lines=[];
     function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}resizeCanvas();window.addEventListener('resize',resizeCanvas);
     for(var i=0;i<12;i++){lines.push({y:Math.random()*canvas.height,speed:0.15+Math.random()*0.3,amplitude:30+Math.random()*60,frequency:0.002+Math.random()*0.003,phase:Math.random()*Math.PI*2,opacity:0.015+Math.random()*0.025,color:i%3===0?'6,182,212':i%3===1?'139,92,246':'236,72,153',width:1+Math.random()*1.5});}
     function drawLines(t){ctx.clearRect(0,0,canvas.width,canvas.height);lines.forEach(function(l){ctx.beginPath();ctx.strokeStyle='rgba('+l.color+','+l.opacity+')';ctx.lineWidth=l.width;for(var x=0;x<canvas.width;x+=3){var y=l.y+Math.sin(x*l.frequency+l.phase+t*0.0005*l.speed)*l.amplitude;if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}ctx.stroke();});}
+    
     var sc=document.getElementById('starsContainer');for(var i=0;i<60;i++){var s=document.createElement('div');s.className='star';s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';var sz=1+Math.random()*2;s.style.width=sz+'px';s.style.height=sz+'px';var cols=['rgba(6,182,212,0.6)','rgba(139,92,246,0.6)','rgba(236,72,153,0.5)','rgba(255,255,255,0.4)'];s.style.background=cols[Math.floor(Math.random()*cols.length)];s.style.animationDuration=(2+Math.random()*4)+'s';s.style.animationDelay=Math.random()*5+'s';s.style.boxShadow='0 0 '+(2+Math.random()*4)+'px '+s.style.background;sc.appendChild(s);}
-    var mc=document.getElementById('meteorsContainer');function spawnMeteor(){var m=document.createElement('div');m.className='meteor';m.style.left=(20+Math.random()*60)+'%';m.style.top='-100px';m.style.animationDuration=(1.5+Math.random()*1.5)+'s';m.style.height=(60+Math.random()*80)+'px';mc.appendChild(m);setTimeout(function(){m.remove()},4000);}setInterval(function(){if(Math.random()>0.5)spawnMeteor()},3000);setTimeout(spawnMeteor,1000);setTimeout(spawnMeteor,2000);
-    var oc=document.getElementById('orbsContainer');var orbCols=['rgba(6,182,212,0.3)','rgba(139,92,246,0.25)','rgba(236,72,153,0.2)','rgba(34,211,238,0.2)','rgba(167,139,250,0.2)'];for(var i=0;i<8;i++){var o=document.createElement('div');o.className='glow-orb';var sz=3+Math.random()*6;o.style.width=sz+'px';o.style.height=sz+'px';o.style.background=orbCols[Math.floor(Math.random()*orbCols.length)];o.style.boxShadow='0 0 '+(8+Math.random()*15)+'px '+o.style.background;o.style.left=Math.random()*100+'%';o.style.top=Math.random()*100+'%';o.style.animationDuration=(8+Math.random()*12)+'s';o.style.animationDelay=(-Math.random()*10)+'s';oc.appendChild(o);}
-    var gc=document.getElementById('geoContainer');var geoSVGs=['<svg width="20" height="20" viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="2" stroke="rgba(6,182,212,0.15)" stroke-width="1" fill="none"/></svg>','<svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" stroke="rgba(139,92,246,0.15)" stroke-width="1" fill="none"/></svg>','<svg width="20" height="20" viewBox="0 0 20 20"><polygon points="10,2 18,18 2,18" stroke="rgba(236,72,153,0.12)" stroke-width="1" fill="none"/></svg>','<svg width="20" height="20" viewBox="0 0 20 20"><line x1="0" y1="10" x2="20" y2="10" stroke="rgba(6,182,212,0.1)" stroke-width="1"/><line x1="10" y1="0" x2="10" y2="20" stroke="rgba(6,182,212,0.1)" stroke-width="1"/></svg>'];
-    function spawnGeo(){var g=document.createElement('div');g.className='geo-shape';g.innerHTML=geoSVGs[Math.floor(Math.random()*geoSVGs.length)];g.style.left=Math.random()*100+'%';g.style.animationDuration=(15+Math.random()*20)+'s';gc.appendChild(g);setTimeout(function(){g.remove()},35000);}for(var i=0;i<4;i++)setTimeout(spawnGeo,i*3000);setInterval(spawnGeo,6000);
+    
+    var mc=document.getElementById('meteorsContainer');function spawnMeteor(){var m=document.createElement('div');m.className='meteor';m.style.left=(20+Math.random()*60)+'%';m.style.top='-100px';m.style.animationDuration=(1.5+Math.random()*1.5)+'s';m.style.height=(60+Math.random()*80)+'px';m.style.cssText+='position:absolute;width:2px;background:linear-gradient(to bottom,rgba(6,182,212,0.6),transparent);';mc.appendChild(m);setTimeout(function(){m.remove()},4000);}setInterval(function(){if(Math.random()>0.5)spawnMeteor()},3000);
+    
     var animTime=0;function animateBG(){animTime+=16;drawLines(animTime);requestAnimationFrame(animateBG);}animateBG();
 
     // Hero particles
@@ -246,30 +253,26 @@
     var glow=document.getElementById('mouseGlow'),mouseX=0,mouseY=0,glowX=0,glowY=0;
     document.addEventListener('mousemove',function(e){mouseX=e.clientX;mouseY=e.clientY;if(!glow.classList.contains('active'))glow.classList.add('active');});document.addEventListener('mouseleave',function(){glow.classList.remove('active');});function animateGlow(){glowX+=(mouseX-glowX)*0.12;glowY+=(mouseY-glowY)*0.12;glow.style.left=glowX+'px';glow.style.top=glowY+'px';requestAnimationFrame(animateGlow);}animateGlow();
 
-    // ===== CMS =====
-    var OWNER_PASSWORD='zxc123zxc123';var isAdmin=false;var snapshotBefore={};var imageSnapshotBefore={};var currentImageEditTarget=null;
-    function loadContent(){try{var saved=localStorage.getItem('site_content');if(saved){var data=JSON.parse(saved);document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k&&data[k]!==undefined)el.textContent=data[k]});}var savedImg=localStorage.getItem('site_images');if(savedImg){var imgData=JSON.parse(savedImg);document.querySelectorAll('.editable-image').forEach(function(img){var k=img.getAttribute('data-img-key');if(k&&imgData[k]!==undefined)img.src=imgData[k]});}}catch(e){}}
-    function takeSnapshot(){snapshotBefore={};imageSnapshotBefore={};document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k)snapshotBefore[k]=el.textContent});document.querySelectorAll('.editable-image').forEach(function(img){var k=img.getAttribute('data-img-key');if(k)imageSnapshotBefore[k]=img.src});}
-    function handleSave(){document.getElementById('savingOverlay').style.display='flex';var c={};var im={};document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k)c[k]=el.textContent.trim()});document.querySelectorAll('.editable-image').forEach(function(img){var k=img.getAttribute('data-img-key');if(k)im[k]=img.src});try{localStorage.setItem('site_content',JSON.stringify(c));localStorage.setItem('site_images',JSON.stringify(im));}catch(e){alert('خطأ:'+e.message);document.getElementById('savingOverlay').style.display='none';return;}setTimeout(function(){location.reload()},1000);}
-    function handleDiscard(){document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k&&snapshotBefore[k]!==undefined)el.textContent=snapshotBefore[k]});document.querySelectorAll('.editable-image').forEach(function(img){var k=img.getAttribute('data-img-key');if(k&&imageSnapshotBefore[k]!==undefined)img.src=imageSnapshotBefore[k]});location.reload();}
-    function enableEditing(){isAdmin=true;takeSnapshot();document.getElementById('adminBar').style.display='block';document.querySelectorAll('.editable-content').forEach(function(el){el.setAttribute('contenteditable','true');el.classList.add('editable-highlight')});}
-    function openAdminLogin(){document.getElementById('adminLoginModal').classList.remove('hidden');document.getElementById('adminPassword').value='';document.getElementById('passwordError').classList.add('hidden');document.getElementById('adminPassword').type='password';document.getElementById('eyeIcon').setAttribute('data-icon','ph:eye-bold');setTimeout(function(){document.getElementById('adminPassword').focus()},100);}
+    // ===== CMS & INTERACTION =====
+    var OWNER_PASSWORD='zxc123zxc123';var isAdmin=false;
+    function loadContent(){try{var saved=localStorage.getItem('site_content');if(saved){var data=JSON.parse(saved);document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k&&data[k]!==undefined)el.textContent=data[k]});}}catch(e){}}
+    function handleSave(){document.getElementById('savingOverlay').style.display='flex';var c={};document.querySelectorAll('.editable-content').forEach(function(el){var k=el.getAttribute('data-key');if(k)c[k]=el.textContent.trim()});try{localStorage.setItem('site_content',JSON.stringify(c));}catch(e){alert('خطأ:'+e.message);return;}setTimeout(function(){location.reload()},1000);}
+    function handleDiscard(){location.reload();}
+    function enableEditing(){isAdmin=true;document.getElementById('adminBar').style.display='block';document.querySelectorAll('.editable-content').forEach(function(el){el.setAttribute('contenteditable','true');el.classList.add('editable-highlight')});}
+    function openAdminLogin(){document.getElementById('adminLoginModal').classList.remove('hidden');document.getElementById('adminPassword').focus();}
     function closeAdminLogin(){document.getElementById('adminLoginModal').classList.add('hidden');}
     function togglePassword(){var i=document.getElementById('adminPassword'),ic=document.getElementById('eyeIcon');if(i.type==='password'){i.type='text';ic.setAttribute('data-icon','ph:eye-slash-bold')}else{i.type='password';ic.setAttribute('data-icon','ph:eye-bold')}}
-    function verifyPassword(){if(document.getElementById('adminPassword').value===OWNER_PASSWORD){document.getElementById('passwordError').classList.add('hidden');closeAdminLogin();enableEditing();showToast('مرحباً! عدّل أي نص ثم اضغط حفظ','success')}else{document.getElementById('passwordError').classList.remove('hidden');var i=document.getElementById('adminPassword');i.style.animation='none';i.offsetHeight;i.style.animation='shake 0.5s ease'}}
-    function showToast(msg,type){type=type||'success';var t=document.getElementById('toast');document.getElementById('toastText').textContent=msg;var ic=document.getElementById('toastIcon');if(type==='success'){ic.setAttribute('data-icon','ph:check-circle-bold');ic.className='iconify text-xl text-emerald-400'}else if(type==='error'){ic.setAttribute('data-icon','ph:warning-bold');ic.className='iconify text-xl text-red-400'}t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden')},3000);}
+    function verifyPassword(){if(document.getElementById('adminPassword').value===OWNER_PASSWORD){closeAdminLogin();enableEditing();showToast('مرحباً! عدّل أي نص ثم اضغط حفظ','success')}else{document.getElementById('passwordError').classList.remove('hidden');}}
+    function showToast(msg,type){var t=document.getElementById('toast');document.getElementById('toastText').textContent=msg;t.classList.remove('hidden');setTimeout(function(){t.classList.add('hidden')},3000);}
     function revealOnScroll(){document.querySelectorAll('.reveal').forEach(function(el){if(el.getBoundingClientRect().top<window.innerHeight-80)el.classList.add('active')});}
     function animateCounters(){document.querySelectorAll('.counter-val').forEach(function(c){var t=parseInt(c.getAttribute('data-target'));if(c.getBoundingClientRect().top<window.innerHeight-50&&!c.classList.contains('counted')){c.classList.add('counted');var cur=0,inc=t/60;var timer=setInterval(function(){cur+=inc;if(cur>=t){cur=t;clearInterval(timer)}c.textContent=Math.floor(cur)+'+'},30)}});}
-    document.getElementById('contactForm').addEventListener('submit',function(e){e.preventDefault();var n=this.querySelector('input[type="text"]').value,p=this.querySelector('input[type="tel"]').value,s=this.querySelector('select').value,d=this.querySelector('textarea').value;var msg='مرحباً، أريد الاستفسار عن خدماتكم 🙋‍♂️\n\n📌 الاسم: '+n+'\n📱 الهاتف: '+p+'\n🛠 الخدمة: '+(s||'غير محدد')+'\n📝 التفاصيل: '+d;window.open('https://wa.me/962792948471?text='+encodeURIComponent(msg),'_blank');showToast('تم توجيهك للواتساب!','success');this.reset();});
-    document.getElementById('saveBtn').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();handleSave();});
-    document.getElementById('discardBtn').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();handleDiscard();});
+    
+    document.getElementById('contactForm').addEventListener('submit',function(e){e.preventDefault();var n=this.querySelector('input[type="text"]').value,p=this.querySelector('input[type="tel"]').value,s=this.querySelector('select').value,d=this.querySelector('textarea').value;var msg='مرحباً، أريد الاستفسار عن خدماتكم 🙋‍♂️\n\n📌 الاسم: '+n+'\n📱 الهاتف: '+p+'\n🛠 الخدمة: '+(s||'غير محدد')+'\n📝 التفاصيل: '+d;window.open('https://wa.me/962792948471?text='+encodeURIComponent(msg),'_blank');});
+    document.getElementById('saveBtn').addEventListener('click',handleSave);
+    document.getElementById('discardBtn').addEventListener('click',handleDiscard);
     document.getElementById('mobileMenuBtn').addEventListener('click',function(){document.getElementById('mobileMenu').classList.toggle('hidden')});
-    document.querySelectorAll('#mobileMenu a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('mobileMenu').classList.add('hidden')})});
-    document.querySelectorAll('a[href^="#"]').forEach(function(a){a.addEventListener('click',function(e){e.preventDefault();var t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})})});
     window.addEventListener('scroll',function(){revealOnScroll();animateCounters()});
     window.addEventListener('load',function(){loadContent();revealOnScroll();animateCounters()});
-    document.getElementById('adminLoginModal').addEventListener('click',function(e){if(e.target===this)closeAdminLogin()});
-    document.getElementById('adminPassword').addEventListener('keydown',function(e){if(e.key==='Enter')verifyPassword()});
 </script>
 </body>
 </html>
